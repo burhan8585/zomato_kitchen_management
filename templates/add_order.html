@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Add Order{% endblock %}
+{% block page_title %}➕ Add New Order{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('add_order') }}">
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Date</label>
+                    <input type="date" name="date" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Total Amount (₹)</label>
+                    <input type="number" step="0.01" name="total_amount" id="total_amount" oninput="calculateCommission()" class="form-control" placeholder="e.g. 500" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Cutlery Cost (₹)</label>
+                    <input type="number" step="0.01" name="cutlery_cost" class="form-control" placeholder="e.g. 5" required>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Zomato Commission (22%)</label>
+                    <input type="text" id="zomato_commission_display" class="form-control" disabled>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Net Income (After Commission)</label>
+                    <input type="text" id="net_income_display" class="form-control" disabled>
+                </div>
+            </div>
+
+            <h4 class="mt-4">🧾 Items:</h4>
+            <div id="items"></div>
+            <button type="button" class="btn btn-primary mt-3" onclick="addItem()">+ Add Item</button>
+
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-success">✅ Submit Order</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let itemCount = 0;
+
+    function addItem() {
+        itemCount++;
+        let itemSection = document.getElementById('items');
+        itemSection.insertAdjacentHTML('beforeend', `
+            <div class="card mt-4" id="item-${itemCount}">
+                <div class="card-body">
+                    <h5 class="card-title">Item ${itemCount}</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Item Name</label>
+                        <input type="text" name="item_name_${itemCount}" class="form-control" placeholder="e.g., Samosa" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" min="1" name="quantity_${itemCount}" class="form-control" placeholder="e.g., 10" required>
+                    </div>
+
+                    <h6>Ingredients:</h6>
+                    <div id="ingredients-${itemCount}"></div>
+                    <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="addIngredient(${itemCount})">+ Add Ingredient</button>
+                </div>
+            </div>
+        `);
+    }
+
+    function addIngredient(itemId) {
+        let ingredientSection = document.getElementById(`ingredients-${itemId}`);
+        let ingredientCount = ingredientSection.childElementCount + 1;
+
+        ingredientSection.insertAdjacentHTML('beforeend', `
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <input type="text" name="ingredient_name_${itemId}_${ingredientCount}" class="form-control" placeholder="Ingredient name" required>
+                </div>
+                <div class="col-md-6">
+                    <input type="number" step="0.01" name="ingredient_cost_${itemId}_${ingredientCount}" class="form-control" placeholder="Cost (₹)" required>
+                </div>
+            </div>
+        `);
+    }
+
+    function calculateCommission() {
+        let totalAmount = parseFloat(document.getElementById('total_amount').value) || 0;
+        let commission = totalAmount * 0.22;
+        let netIncome = totalAmount - commission;
+
+        document.getElementById('zomato_commission_display').value = commission.toFixed(2);
+        document.getElementById('net_income_display').value = netIncome.toFixed(2);
+    }
+</script>
+{% endblock %}

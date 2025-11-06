@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Summary{% endblock %}
+{% block page_title %}📊 Kitchen Summary{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card text-bg-primary h-100 shadow-sm">
+            <div class="card-body">
+                <h6>Total Revenue</h6>
+                <h3>₹{{ total_revenue }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-danger h-100 shadow-sm">
+            <div class="card-body">
+                <h6>Zomato Commission</h6>
+                <h3>₹{{ total_commission }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-info h-100 shadow-sm">
+            <div class="card-body">
+                <h6>Total Ingredient Cost</h6>
+                <h3>₹{{ total_ingredient_cost }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-dark h-100 shadow-sm">
+            <div class="card-body">
+                <h6>Total Cutlery Cost</h6>
+                <h3>₹{{ total_cutlery_cost }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-4">
+    <div class="col-md-12">
+        <div class="card text-bg-success shadow-sm">
+            <div class="card-body">
+                <h6>Net Profit / Loss</h6>
+                <h3 class="{{ 'text-warning' if total_profit_loss < 0 else 'text-white' }}">₹{{ total_profit_loss }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-5">🔥 Top 5 Selling Items</h4>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Item Name</th>
+                    <th>Total Quantity Sold</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in top_items %}
+                <tr>
+                    <td>{{ row['item_name'] }}</td>
+                    <td>{{ row['total_qty'] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No data available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Order Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Your Orders</h2>
+    <div>
+        <!-- Export Button with Filter Params -->
+        <a href="{{ url_for('export_csv', start_date=request.args.get('start_date'), end_date=request.args.get('end_date')) }}"
+           class="btn btn-success">📥 Download CSV</a>
+        <a href="{{ url_for('add_order') }}" class="btn btn-primary ms-2">+ Add Order</a>
+    </div>
+</div>
+
+<!-- Date Range Filter Form -->
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label for="start_date" class="form-label">From Date</label>
+        <input type="date" id="start_date" name="start_date" class="form-control"
+               value="{{ request.args.get('start_date', '') }}">
+    </div>
+    <div class="col-md-4">
+        <label for="end_date" class="form-label">To Date</label>
+        <input type="date" id="end_date" name="end_date" class="form-control"
+               value="{{ request.args.get('end_date', '') }}">
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-secondary me-2">Filter</button>
+        {% if request.args.get('start_date') or request.args.get('end_date') %}
+            <a href="{{ url_for('index') }}" class="btn btn-outline-dark">Reset</a>
+        {% endif %}
+    </div>
+</form>
+
+{% if orders %}
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Total (₹)</th>
+                        <th>Commission (₹)</th>
+                        <th>Net (₹)</th>
+                        <th>Ingredients (₹)</th>
+                        <th>Cutlery (₹)</th>
+                        <th>Profit/Loss</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order['order_date'] }}</td>
+                            <td>{{ order['total_amount'] }}</td>
+                            <td>{{ order['zomato_commission'] }}</td>
+                            <td>{{ order['net_income'] }}</td>
+                            <td>{{ order['ingredient_total'] }}</td>
+                            <td>{{ order['cutlery_cost'] }}</td>
+                            <td>
+                                <span class="{{ 'text-success' if order['profit_loss'] >= 0 else 'text-danger' }}">
+                                    {{ order['profit_loss'] }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('view_order', order_id=order['id']) }}" class="btn btn-sm btn-info">View</a>
+                                <a href="{{ url_for('edit_order', order_id=order['id']) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{{ url_for('delete_order', order_id=order['id']) }}" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Are you sure you want to delete this order?');">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info">No orders found. Try adjusting your filters.</div>
+{% endif %}
+{% endblock %}

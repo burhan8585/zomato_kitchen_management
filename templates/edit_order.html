@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Order{% endblock %}
+{% block page_title %}✏️ Edit Order{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+      <form method="POST">
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Date</label>
+            <input type="date" name="date" value="{{ order['order_date'] }}" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Total Amount (₹)</label>
+            <input type="number" step="0.01" name="total_amount" id="total_amount" value="{{ order['total_amount'] }}" class="form-control" oninput="calculateCommission()" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Cutlery Cost (₹)</label>
+            <input type="number" step="0.01" name="cutlery_cost" value="{{ order['cutlery_cost'] }}" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Zomato Commission (22%)</label>
+            <input type="text" id="zomato_commission_display" class="form-control" disabled>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Net Income (After Commission)</label>
+            <input type="text" id="net_income_display" class="form-control" disabled>
+          </div>
+        </div>
+
+        <h4 class="mt-4 mb-3">📦 Items</h4>
+        <div id="items">
+          {% for detail in item_details %}
+          {% set outer_idx = loop.index %}
+          <div class="card mt-4" id="item-{{ outer_idx }}">
+            <div class="card-body">
+              <h5 class="card-title">Item {{ outer_idx }}</h5>
+
+              <input type="text" name="item_name_{{ outer_idx }}" class="form-control mb-3" value="{{ detail.item['item_name'] }}" required>
+              <input type="number" min="1" name="quantity_{{ outer_idx }}" class="form-control mb-3" value="{{ detail.item['quantity'] }}" required>
+
+              <h6>🧂 Ingredients:</h6>
+              <div id="ingredients-{{ outer_idx }}">
+                {% for ing in detail.ingredients %}
+                {% set ing_idx = loop.index %}
+                <div class="row g-3 mt-2 ingredient-row">
+                  <div class="col-md-5">
+                    <input type="text" name="ingredient_name_{{ outer_idx }}_{{ ing_idx }}" class="form-control" value="{{ ing['ingredient_name'] }}" required>
+                  </div>
+                  <div class="col-md-5">
+                    <input type="number" step="0.01" name="ingredient_cost_{{ outer_idx }}_{{ ing_idx }}" class="form-control" value="{{ ing['ingredient_cost'] }}" required>
+                  </div>
+                  <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-ingredient">❌</button>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+
+              <button type="button"
+                      class="btn btn-secondary btn-sm mt-2 add-ingredient"
+                      data-item-id="{{ outer_idx }}">+ Add Ingredient</button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-primary mt-3" onclick="addItem()">+ Add New Item</button>
+
+        <div class="text-end mt-4">
+          <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-success">💾 Save Changes</button>
+        </div>
+      </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// JavaScript from your earlier logic
+// [Paste your existing JS functions: addIngredient, addItem, calculateCommission...]
+</script>
+{% endblock %}

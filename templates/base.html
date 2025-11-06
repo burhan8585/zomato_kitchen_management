@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0; left: 0;
+            background-color: #000000;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            color: #adb5bd;
+            padding: 15px;
+            text-decoration: none;
+            display: block;
+        }
+        .sidebar a:hover, .sidebar .active {
+            background-color: #495057;
+            color: white;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="{{ url_for('index') }}" class="{% if request.path == '/' %}active{% endif %}">🏠 Dashboard</a>
+    <a href="{{ url_for('add_order') }}" class="{% if 'add' in request.path %}active{% endif %}">➕ Add Order</a>
+    <a href="{{ url_for('summary') }}" class="{% if 'summary' in request.path %}active{% endif %}">📊 Summary</a>
+    <a href="{{ url_for('export_csv') }}">⬇️ Export CSV</a>
+    <a href="{{ url_for('stock') }}">📦 Stock</a>
+
+   
+
+    <a href="{{ url_for('logout') }}" class="text-danger mt-auto">🚪 Logout</a>
+</div>
+
+<div class="main-content">
+    <nav class="navbar navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">{% block page_title %}Dashboard{% endblock %}</span>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} py-2">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
